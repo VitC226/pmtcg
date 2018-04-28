@@ -42,7 +42,7 @@
                     <small>HP</small>&nbsp;{{ $info->hp }}&nbsp;
                     @endif
                     @if($info->energyName)
-                    {{ $info->energyName }}
+                    {!! energy($info->energyName) !!}
                     @endif
                 </span>
             </h2>
@@ -72,7 +72,7 @@
                 @foreach ($power as $item)
                 <div class="panel panel-info">
                     <div class="panel-heading">
-                        <span>{{$item->cost}}</span>
+                        <span>{!! energy($item->cost) !!}</span>
                         {{ $item->title }}
                         <span class="pull-right">{{$item->damage}}</span>
                     </div>
@@ -87,15 +87,15 @@
             <div class="row text-center">
                 <div class="col-xs-4">
                     <label>弱点</label>
-                    <div class="rwbox">{{$info->weakness}}</div>
+                    <div class="rwbox">{!! energy($info->weakness) !!}</div>
                 </div>
                 <div class="col-xs-4">
                     <label>抗性</label>
-                    <div class="rwbox">{{$info->resistance}}</div>
+                    <div class="rwbox">{!! energy($info->resistance) !!}</div>
                 </div>
                 <div class="col-xs-4">
                     <label>撤退</label>
-                    <div class="energy-list">{{$info->resistance}}</div>
+                    <div class="energy-list">{!! energy($info->resistance) !!}</div>
                 </div>
             </div>
             @endif
