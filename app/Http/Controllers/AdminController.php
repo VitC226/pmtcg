@@ -33,7 +33,6 @@ class AdminController extends Controller
         return view('admin.card', [ 'list' => $list ]);
     }
     public function cardEdit($card){
-
         $card = (int) $card;
         $info = DB::table('pm_card')
                 ->leftJoin('pm_subcategory', 'pm_card.subcategory', '=', 'pm_subcategory.id')
@@ -53,8 +52,9 @@ class AdminController extends Controller
                     ->leftJoin('pm_power_title as t2', 'a.bodytitle', '=', 't2.id')
                     ->leftJoin('pm_power_content as c2', 'a.bodycontent', '=', 'c2.id')
                     ->leftJoin('pm_rule as r', 'a.exId', '=', 'r.id')
-                    ->select('t.title as abilityName', 'c.content as abilityContent', 'a.restored', 'a.exId', 'a.exObject', 'r.title as ruleName', 'r.content as ruleContent', 't2.title as bodyName','c2.content as bodyContent', 'a.LV', 'a.BODY2')
+                    ->select('t.id as abilityId', 't.title as abilityName', 'c.id as abilityContentId', 'c.content as abilityContent', 't.title_en as abilityNameEn', 'c.content_en as abilityContentEn', 'a.restored', 'a.exId', 'a.exObject', 'r.title as ruleName', 'r.content as ruleContent', 't2.title as bodyName','c2.content as bodyContent', 'a.LV', 'a.BODY2')
                     ->where('a.cardId', $card)->first();
+
         $power = DB::table('pm_ability_power as p')
                     ->leftJoin('pm_power_title as t', 'p.title', '=', 't.id')
                     ->leftJoin('pm_power_content as c', 'p.content', '=', 'c.id')
@@ -69,6 +69,8 @@ class AdminController extends Controller
         $rule = Input::get('rule');
         $text = Input::get('text');
         $key = Input::get('key');
+        $key = str_replace("^"," ",$key);
+
         $php = Input::get('php');
         $json = array('rule' => $rule);
         $json["text"] = $text;
@@ -122,11 +124,10 @@ class AdminController extends Controller
                         $newTemp = str_replace("*",$newTemp,$text);
                     }
 
-                    preg_match_all("/\d+/",$str,$arr);
-                    $arr = $arr[0];
-                    $count = count($arr);
-                    if($count>0 && $flag){
+                    if(strpos($str,'0 ') !==false && $flag){
                         $flag = false;
+                        preg_match_all("/\d+0/",$str,$arr);
+                        $arr = $arr[0];
                         foreach ($arr as $key => $value) {
                             $newTemp.= $value;
                         }

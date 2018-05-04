@@ -11,7 +11,6 @@ use Qiniu\Processing\PersistentFop;
 
 class ImageDuel {
     public function create($url, $fileName) {
-        $fileName = "SM5_8";
         $bucket = 'card';
         $thumb = 'thumb';
 
@@ -19,7 +18,7 @@ class ImageDuel {
         $secretKey = 'XVmHYNRMHJ2R5l_2xSGRgEfXpUc9JPBuDgBz2Mzh';
         $auth = new Auth($accessKey, $secretKey);
 
-        $key = $fileName . '.png';/*
+        $key = $fileName . '.png';
         if(strpos($url,'http') !==false){
             //抓取
             $bucketManager = new BucketManager($auth);
@@ -30,7 +29,7 @@ class ImageDuel {
             $token = $auth->uploadToken($bucket);
             $uploadMgr = new UploadManager();
             list($ret, $err) = $uploadMgr->putFile($token, $key, $source);
-        }*/
+        }
 
         //生成缩略图
         $destKey = $fileName . "_thumb.jpg";

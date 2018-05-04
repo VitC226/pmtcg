@@ -3,8 +3,12 @@
 <script>
   $(function(){
       //url: "http://p7vlj38y9.bkt.clouddn.com/BW10_1.png",
-
-    $('img#mainImg').on('load', function() {
+      $(".card-image").on("mouseenter",function(){
+        $(this).css("opacity",1);
+      }).on("mouseleave",function(){
+        $(this).css("opacity",0);
+      });
+    $('img#mainImg').on('error', function() {
       $.post('loadImg',{
           cid:$("#cardId").val()
       },function(data){
@@ -15,20 +19,14 @@
     $(".box").on("click","button",function(){
       var inputs = $(this).parent().next().find("input");
       var li = $(this).parent().next().find("li").eq(0);
-      console.log({
-          tid:$(this).parent().data("id"),
-          rule:inputs.eq(0).val(),
-          php:inputs.eq(1).val(),
-          text:inputs.eq(2).val(),
-          key:li.data("value")
-      });
-      return;
+      var key = li.data("value");
+      if (key.indexOf(" ") == 0){ key="^"+key; }
       $.post('translate',{
           tid:$(this).parent().data("id"),
           rule:inputs.eq(0).val(),
           php:inputs.eq(1).val(),
           text:inputs.eq(2).val(),
-          key:li.data("value")
+          key:key
       }, function(data){
           console.log(data);
           
@@ -60,7 +58,7 @@
         @if($info)
         <input type="hidden" id="cardId" value="{{$info->cardId}}">
         <div class="col-md-4">
-            <div class="card-image">
+            <div class="card-image" style="opacity:0;">
                 <img id="mainImg" src="http://p7vlj38y9.bkt.clouddn.com/{{$info->img}}.png">
                 <img src="http://p7vlj38y9.bkt.clouddn.com/{{$info->img}}_thumb.jpg" style="width: 160px;">
             </div>
@@ -84,13 +82,19 @@
             @if($abilitys)
             <div class="abilitys">
                 @if($abilitys->abilityName)
-                <div class="panel panel-default">
-                  <div class="panel-heading">
-                    <span class="label label-primary">特性</span>
-                    {{ $abilitys->abilityName }}
-                  </div>
+                <div id="ability-{{ $abilitys->abilityId }}" class="panel panel-default">
                   <div class="panel-body">
-                    {{ $abilitys->abilityContent }}
+                    <div class="form-group">
+                        <label><span class="label label-primary">特性</span>{{ $abilitys->abilityName }}&nbsp;/&nbsp;{{ $abilitys->abilityNameEn }}</label>
+                        <input type="text" class="form-control" value="{{ $abilitys->abilityName }}">
+                    </div>
+                    <div class="form-group">
+                        <label>{{ $abilitys->abilityContent }}</label>
+                        <label>{{ $abilitys->abilityContentEn }}</label>
+                        <textarea rows="5" class="form-control">{{ $abilitys->abilityContent }}</textarea>
+                        <button type="button" data-id="{{$abilitys->abilityContentId}}" class="btn btn-info pull-right btn-xs btn-power">保存</button>
+                    </div>
+                    {!! analysis($abilitys->abilityContentEn) !!}
                   </div>
                 </div>
                 @endif

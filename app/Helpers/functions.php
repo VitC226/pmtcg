@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\DB;
+use App\Libs\ImageDuel;
 
 function energy($value=''){
     return "<i class='energy energy-".$value."'>".$value."</i>";
@@ -12,8 +13,9 @@ function analysis($value=''){
     $rules = [];
     foreach ($arr as $key => $item) {
         if($item == ""){ array_splice($arr,$key); }
-        else{ 
-            $text = substr($value,strpos($value, $item),strlen($item)+1);
+        else{
+            $int = (strpos($item,'(') !==false)?2:1;
+            $text = substr($value,strpos($value, $item),strlen($item)+$int);
             $arr[$key] = $text;
             $rules[$key] = $arr[$key];
             
@@ -32,6 +34,13 @@ function analysis($value=''){
             if(count($temp)){
                 $pattern = '/<span class="energy-symbol (.*?)" title="(.*?)">(.*?)<\/span>/';
                 $new = preg_replace($pattern,"*",$text);
+                $rules[$key] = $new;
+                continue;
+            }
+
+            if(strpos($text,'0 ') !==false){
+                $pattern = '/\d+0/';
+                $new = preg_replace($pattern,"[0-9]*",$text);
                 $rules[$key] = $new;
                 continue;
             }
@@ -61,10 +70,10 @@ function analysis($value=''){
 
 function  hello(){
     /*
-    $content = 'Search your deck for a <span class="energy-symbol Grass" title="Grass">Grass</span> ,<span class="energy-symbol Fighting" title="Fighting">Fighting</span><span class="energy-symbol Fighting" title="Fighting">Fighting</span> Energy card and attach it to 1 of your Pokémon.';
-    $rule = "Search your deck for a % Energy card and attach it to 1 of your Pokémon\.";
-    $text = "从卡组搜索1张*能量卡并放置到己方场上1只宝可梦身上，";
-    $php = "[Ss]earch your deck for a (.*?) Energy card and attach it to 1 of your Pokémon[.]";
+    $content = 'Heal 40 damage from this Pokémon.';
+    $rule = "Heal [0-9]* damage from this Pokémon.";
+    $text = "回复自身[0-9]*点HP。";
+    $php = "[Hh]eal \d+0 damage from this Pokémon.";
     if(strpos($rule,'%')===false){
                 $list = DB::select("SELECT * FROM pm_power_content WHERE content_en REGEXP\"".$rule."\" and status is null");
             }
@@ -98,22 +107,20 @@ function  hello(){
                     $arr = $arr[0];
                     $count = count($arr);
                     if($count>0 && $flag){
-                        dump($arr);
                         $flag = false;
                         for ($i=0; $i < $count; $i+=3) {  $newTemp.= "{".$arr[$i]."}"; }
                         $newTemp = str_replace("*",$newTemp,$text);
-                        dump($newTemp);
                     }
 
-                    preg_match_all("/\d+/",$str,$arr);
-                    $arr = $arr[0];
-                    $count = count($arr);
-                    if($count>0 && $flag){
+                    if(strpos($str,'0 ') !==false && $flag){
                         $flag = false;
+                        preg_match_all("/\d+0/",$str,$arr);
+                        $arr = $arr[0];
                         foreach ($arr as $key => $value) {
                             $newTemp.= $value;
                         }
                         $newTemp = str_replace("[0-9]*",$newTemp,$text);
+                        dump($newTemp);
                     }
 
                     $newTemp = str_replace($str,$newTemp,$content);
