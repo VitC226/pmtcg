@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Libs\ImageDuel;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Input;
 use QL\QueryList;
 
 class AdminController extends Controller
 {
     public function __construct(){
         $this->middleware('auth');
-        $this->collectIndex = "";
     }
 
     ///管理中心
@@ -31,6 +33,7 @@ class AdminController extends Controller
         return view('admin.card', [ 'list' => $list ]);
     }
     public function cardEdit($card){
+
         $card = (int) $card;
         $info = DB::table('pm_card')
                 ->leftJoin('pm_subcategory', 'pm_card.subcategory', '=', 'pm_subcategory.id')
@@ -40,8 +43,10 @@ class AdminController extends Controller
                 ->leftJoin('pm_card_type_class', 'pm_card.typeClass', '=', 'pm_card_type_class.id')
                 ->leftJoin('pm_energy', 'pm_description.energy', '=', 'pm_energy.id')
                 ->leftJoin('pm_illustrator', 'pm_card.illustrator', '=', 'pm_illustrator.id')
-                ->select('pm_card.cardId', 'pm_card.pkmId', 'pm_card.pmId', 'pm_card_title.title', 'pm_card.img', 'pm_card.type', 'pm_card_type.name as typeName', 'pm_subcategory.name as cate', 'pm_card.rarity', 'pm_card_type_class.name as tc', 'pm_energy.name as energyName', 'pm_description.hp', 'pm_description.lv', 'pm_description.evolve', 'pm_description.weakness', 'pm_description.resistance', 'pm_description.retreat', 'pm_subcategory.name as illustratorName')
+                ->select('pm_card.cardId', 'pm_card.pkmId', 'pm_card.pmId', 'pm_card_title.title', 'pm_card.img', 'pm_card.type', 'pm_card_type.name as typeName', 'pm_subcategory.name as cate', 'pm_card.rarity', 'pm_card_type_class.name as tc', 'pm_energy.name as energyName', 'pm_description.hp', 'pm_description.lv', 'pm_description.evolve', 'pm_description.weakness', 'pm_description.resistance', 'pm_description.retreat', 'pm_subcategory.name as illustratorName', 'pm_card.link')
                 ->where('pm_card.cardId', $card)->first();
+
+        //print_r($imageUrl);
         $abilitys = DB::table('pm_ability as a')
                     ->leftJoin('pm_power_title as t', 'a.abilitytitle', '=', 't.id')
                     ->leftJoin('pm_power_content as c', 'a.abilitycontent', '=', 'c.id')
@@ -53,11 +58,142 @@ class AdminController extends Controller
         $power = DB::table('pm_ability_power as p')
                     ->leftJoin('pm_power_title as t', 'p.title', '=', 't.id')
                     ->leftJoin('pm_power_content as c', 'p.content', '=', 'c.id')
-                    ->select('p.id', 'p.cardId', 'p.cost', 'p.damage', 't.title', 'c.content', 't.title_en', 'c.content_en')
+                    ->select('p.id', 'p.cardId', 'p.cost', 'p.damage','t.id as tId', 't.title','c.id as cId', 'c.content', 't.title_en', 'c.content_en')
                     ->where('p.cardId', $card)->orderBy('p.id')->get();
         return view('admin.cardEdit',[ 'info' => $info, 'abilitys' => $abilitys, 'power' => $power  ]);
     }
 
+    public function translate(Request $request)
+    {
+        $id = Input::get('tid');
+        $rule = Input::get('rule');
+        $text = Input::get('text');
+        $key = Input::get('key');
+        $php = Input::get('php');
+        $json = array('rule' => $rule);
+        $json["text"] = $text;
+        $json["tid"] = $id;
+        $json["key"] = $key;
+        $json["php"] = $php;
+        
+        if($id){
+            DB::table('translator')
+                ->where('id', $id)
+                ->update(['rule' => $rule, 'text' => $text, 'php' => $php]);
+        }else{
+            $id = DB::table('translator')->insertGetId(['key' => $key, 'rule' => $rule, 'text' => $text, 'php' => $php]);
+        }
+
+        //开始翻译
+        if($rule){
+            if(strpos($rule,'%')===false){
+                $list = DB::select("SELECT * FROM pm_power_content WHERE content_en REGEXP\"".$rule."\" and status is null");
+            }
+            else{
+                $list = DB::select("SELECT * FROM pm_power_content WHERE content_en  like \"%".$rule."%\"");
+            }
+            $cn = array("Confused"=>"混乱","Asleep"=>"睡眠","Poisoned"=>"中毒","Paralyzed"=>"麻痹","Burned"=>"灼伤");
+            foreach ($list as $item) {
+                $content = $item->content;
+                $flag = true;
+                $newTemp = "";
+                preg_match_all("/".$php."/",$content,$str);
+                if(count($str[0]) > 0){
+                    $str = $str[0][0];
+                    $cn = array("Confused"=>"混乱","Asleep"=>"睡眠","Poisoned"=>"中毒","Paralyzed"=>"麻痹","Burned"=>"灼伤");
+                    preg_match_all("/\b(Confused|Asleep|Poisoned|Paralyzed|Burned)\b/",$str,$arr);
+                    $arr = $arr[0];
+                    $count = count($arr);
+                    if($count>0 && $flag){
+                        $flag = false;
+                        foreach ($arr as $key => $value) {
+                            $newTemp.= $cn[$value];
+                            if($key+1 < $count){ $newTemp.= "、"; }
+                        }
+                        $newTemp = str_replace("*",$newTemp,$text);
+                    }
+
+                    preg_match_all("/\b(Grass|Fire|Water|Lightning|Psychic|Fighting|Darkness|Metal|Colorless|Fairy|Dragon)\b/",$str,$arr);
+                    $arr = $arr[0];
+                    $count = count($arr);
+                    if($count>0 && $flag){
+                        $flag = false;
+                        for ($i=0; $i < $count; $i+=3) {  $newTemp.= "{".$arr[$i]."}"; }
+                        $newTemp = str_replace("*",$newTemp,$text);
+                    }
+
+                    preg_match_all("/\d+/",$str,$arr);
+                    $arr = $arr[0];
+                    $count = count($arr);
+                    if($count>0 && $flag){
+                        $flag = false;
+                        foreach ($arr as $key => $value) {
+                            $newTemp.= $value;
+                        }
+                        $newTemp = str_replace("[0-9]*",$newTemp,$text);
+                    }
+
+                    $newTemp = str_replace($str,$newTemp,$content);
+                }
+                
+                $pos1 = strpos($newTemp,".");
+                $pos2 = strpos($newTemp,",");
+                if($newTemp != ""){
+                    if(!$pos1 && !$pos2){
+                        DB::table('pm_power_content')->where('id', $item->id)->update(['content' => $newTemp, 'status' => 1]);
+                    }else{
+                        DB::table('pm_power_content')->where('id', $item->id)->update(['content' => $newTemp]);
+                    }
+                    $item->content = $newTemp;
+                }
+            }
+        }
+        else{
+            $list = DB::table('pm_power_content')->where('content_en', 'like', '%'.$key.'%')->whereNull('status')->get();
+            foreach ($list as $item) {
+                $new = str_replace($key,$text,$item->content);
+
+                $pos1 = strpos($new,".");
+                $pos2 = strpos($new,",");
+                if($new != ""){
+                    if(!$pos1 && !$pos2){
+                        DB::table('pm_power_content')->where('id', $item->id)->update(['content' => $new, 'status' => 1]);
+                    }else{
+                        DB::table('pm_power_content')->where('id', $item->id)->update(['content' => $new]);
+                    }
+                    $item->content = $new;
+                }
+            }
+        }
+        $json["list"] = $list;
+
+        return response()->json($json);
+    }
+
+    public function translateSave(Request $request){
+        $pid = Input::get('pid');
+        $newTemp = Input::get('text');
+
+        $pos1 = strpos($newTemp,".");
+        $pos2 = strpos($newTemp,",");
+        if($newTemp != ""){
+            if(!$pos1 && !$pos2){
+                DB::table('pm_power_content')->where('id', $pid)->update(['content' => $newTemp, 'status' => 1]);
+            }else{
+                DB::table('pm_power_content')->where('id', $pid)->update(['content' => $newTemp]);
+            }
+        }
+        $json = array('text' => $newTemp);
+        return response()->json($json);
+    }
+    public function loadImg(Request $request){
+        $cid = Input::get('cid');
+        $card = DB::table('pm_card')->where('cardId', $cid)->first();
+        $image = new ImageDuel();
+        $image->create($card->link,$card->img);
+        $json = array('text' => "请求已提交");
+        return response()->json($json);
+    }
 
     public function collect(){
         $url = "https://www.pokemon.com/us/pokemon-tcg/pokemon-cards/sm-series/sm1/1/";
