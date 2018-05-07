@@ -20,6 +20,7 @@ Route::get('/home', 'HomeController@index')->name('home');
 //Route::get('/database', 'CardController@list');
 Route::get('/database/{cate?}', 'CardController@list');
 Route::get('/card/{card}', 'CardController@card');
+Route::get('/card/{card}', 'CardController@card');
 
 /* Admin */
 Route::get('admin/index', 'AdminController@index');

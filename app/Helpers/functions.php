@@ -18,6 +18,20 @@ function energy($value){
     }
 }
 
+function contentEnergy($str){
+    $str = strtolower($str);
+    preg_match_all("/{(.*?)}/",$str ,$temp);
+    if($temp[0]){
+        $temp = $temp[0];
+        foreach ($temp as $item) {
+            $text = str_replace('{','<i class="energy icon-',$item);
+            $text = str_replace('}', '"></i>', $text);
+            $str = str_replace($item, $text, $str);
+        }
+    }
+    echo($str);
+}
+
 function statLoad($str){
     $temp = "";
     $str = strtolower(trim($str));

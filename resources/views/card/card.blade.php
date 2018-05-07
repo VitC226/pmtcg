@@ -1,4 +1,11 @@
 @extends('layouts.app')
+
+@section('seo')
+<meta name="keywords" content="pokemon,精灵宝可梦,宝可梦,口袋妖怪,宠物小精灵,神奇宝贝,卡牌,卡牌游戏,精灵宝可梦卡牌,口袋妖怪卡牌,神奇宝贝卡牌,集换式卡牌游戏,精灵宝可梦卡牌中文网,{{$info->title}}">
+<meta name="description" content="精灵宝可梦卡牌中文网，提供最新卡牌中文数据库查询。">
+<title>{{$info->title}}-{{$info->tc}}-精灵宝可梦卡牌中文网</title>
+@endsection
+
 @section('style')
 <style>
     *{ font-size: 16px; }
@@ -74,7 +81,7 @@
         @if($info)
         <div class="col-md-4">
             <div class="card-image text-center">
-                <img src="http://p7vlj38y9.bkt.clouddn.com/{{$info->img}}.pn1g" alt="{{$info->title}}">
+                <img src="http://p7vlj38y9.bkt.clouddn.com/{{$info->img}}.png" alt="{{$info->title}}">
                 <br><br>
                 <label>插图：<a href="#">{{ $info->illustratorName }}</a></label>
             </div>
@@ -138,7 +145,7 @@
                     {{ $abilitys->abilityName }}
                   </h3>
                   <div class="panel-body">
-                    {{ $abilitys->abilityContent }}
+                    {!! contentEnergy($abilitys->abilityContent) !!}
                   </div>
                 </div>
                 @endif
@@ -149,12 +156,10 @@
                 @foreach ($power as $item)
                 <div class="panel">
                     <h3 class="panel-heading">
-                        <span>{!! energy($item->cost) !!}</span>
-                        {{ $item->title }}
-                        <span class="pull-right">{{$item->damage}}</span>
+                        <span>{!! energy($item->cost) !!}</span>&nbsp;&nbsp;&nbsp;{{ $item->title }}<span class="pull-right">{{$item->damage}}</span>
                     </h3>
                     <div class="panel-body">
-                        {{ $item->content }}
+                        {!! contentEnergy($item->content) !!}
                     </div>
                 </div>
                 @endforeach
