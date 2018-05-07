@@ -44,7 +44,6 @@ class AdminController extends Controller
                 ->leftJoin('pm_illustrator', 'pm_card.illustrator', '=', 'pm_illustrator.id')
                 ->select('pm_card.cardId', 'pm_card.pkmId', 'pm_card.pmId', 'pm_card_title.title', 'pm_card.img', 'pm_card.type', 'pm_card_type.name as typeName', 'pm_subcategory.name as cate', 'pm_card.rarity', 'pm_card_type_class.name as tc', 'pm_energy.name as energyName', 'pm_description.hp', 'pm_description.lv', 'pm_description.evolve', 'pm_description.weakness', 'pm_description.resistance', 'pm_description.retreat', 'pm_subcategory.name as illustratorName', 'pm_card.link')
                 ->where('pm_card.cardId', $card)->first();
-
         //print_r($imageUrl);
         $abilitys = DB::table('pm_ability as a')
                     ->leftJoin('pm_power_title as t', 'a.abilitytitle', '=', 't.id')
@@ -61,6 +60,7 @@ class AdminController extends Controller
                     ->select('p.id', 'p.cardId', 'p.cost', 'p.damage','t.id as tId', 't.title','c.id as cId', 'c.content', 't.title_en', 'c.content_en')
                     ->where('p.cardId', $card)->orderBy('p.id')->get();
         return view('admin.cardEdit',[ 'info' => $info, 'abilitys' => $abilitys, 'power' => $power  ]);
+        //return view('admin.cardEdit');
     }
 
     public function translate(Request $request)
@@ -69,7 +69,7 @@ class AdminController extends Controller
         $rule = Input::get('rule');
         $text = Input::get('text');
         $key = Input::get('key');
-        $key = str_replace("^"," ",$key);
+        $key = str_replace("^","",$key);
 
         $php = Input::get('php');
         $json = array('rule' => $rule);
@@ -85,7 +85,6 @@ class AdminController extends Controller
         }else{
             $id = DB::table('translator')->insertGetId(['key' => $key, 'rule' => $rule, 'text' => $text, 'php' => $php]);
         }
-
         //开始翻译
         if($rule){
             if(strpos($rule,'%')===false){
@@ -132,6 +131,17 @@ class AdminController extends Controller
                             $newTemp.= $value;
                         }
                         $newTemp = str_replace("[0-9]*",$newTemp,$text);
+                    }
+
+                    if(strpos($rule,'%')!==false && $flag){
+                        $flag = false;
+                        $len = strlen($str);
+                        $arr = explode('%',$rule);
+                        $before = strlen($arr[0]);
+                        $after = $len - $before - strlen($arr[1]);
+
+                        $newTemp = substr($str, $before, $after);
+                        $newTemp = str_replace("*",$newTemp,$text);
                     }
 
                     $newTemp = str_replace($str,$newTemp,$content);

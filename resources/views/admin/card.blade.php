@@ -16,7 +16,7 @@
                     {{ $item->pkmId }}
                 </td>
                 <td>
-                    <a href="card/{{ $item->cardId }}">{{ $item->title }}</a>
+                    <a href="/admin/card/{{ $item->cardId }}">{{ $item->title }}</a>
                 </td>
                 <td>
                     {{ $item->cate }}
@@ -31,7 +31,7 @@
                     {{ $item->hp }}
                 </td>
                 <td>
-                    <a href="cardEdit/{{ $item->cardId }}">编辑</a>
+                    <a href="/admin/cardEdit/{{ $item->cardId }}">编辑</a>
                 </td>
             </tr>
         @endforeach

@@ -13,6 +13,9 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link href="{{ asset('css/pokemon.css') }}" rel="stylesheet">
+
+    @yield('style')
 </head>
 <body>
     <div id="app">
@@ -58,5 +61,6 @@
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
+    @yield('script')
 </body>
 </html>

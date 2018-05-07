@@ -11,15 +11,14 @@
 |
 */
 
-Route::get('/', function () {
-    return view('home');
-});
+Route::get('/', 'HomeController@index');
 
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::get('/database', 'CardController@list');
+//Route::get('/database', 'CardController@list');
+Route::get('/database/{cate?}', 'CardController@list');
 Route::get('/card/{card}', 'CardController@card');
 
 /* Admin */

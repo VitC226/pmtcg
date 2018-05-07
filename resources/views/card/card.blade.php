@@ -1,14 +1,83 @@
 @extends('layouts.app')
+@section('style')
+<style>
+    *{ font-size: 16px; }
+    #card .panel{
+        border: none;
+        margin-bottom: 60px;
+        box-shadow: none;
+    }
+    #card .panel-heading{
+        margin-top: 10px;
+        line-height: 38px;
+        margin-bottom: 0;
+    }
+    #card .panel-heading .pull-right{
+        font-size: 25px;
+    }
+    #card .top .panel-heading{
+        border-radius: 5px 5px 0 0;
+        background-color: #ccc;
+        color: #F2F2F2;
+        font-size: 22px;
+        padding: .6em 0.8em .3em;
+    }
+    #card .top .panel-content{
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        align-items: center;
+        background: #F2F2F2;
+        color: #313131;
+        clear: both;
+        padding: 1.2em;
+        overflow: hidden;
+    }
 
+    #card .label {
+        float: left;
+        padding: .5em .6em .4em;
+        margin-right: 16px;
+        background-color: #d13f2d;
+    }
+
+    #card .input-group{
+        margin-bottom: 50px;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    #card .input-group .input-group-addon{
+        padding: 15px 20px;
+        background-color: #d13f2d;
+        color: #f3f3f3;
+    }
+    #card .input-group .form-control{
+        padding: 15px 10px;
+        display: inherit;
+        background-color: #f2f2f2;
+        border-color: #f2f2f2;
+        box-shadow: none;
+    }
+    .jumbotron{
+        background-color: #f2f2f2;
+        margin: 1.5em 0;
+        padding: 2em 0;
+    }
+    .stats-footer{
+        margin-bottom: 80px;
+    }
+</style>
+@endsection
 @section('content')
-<div class="container">
+<div id="card" class="container">
     <div class="row">
         @if($info)
         <div class="col-md-4">
-            <div class="card-image">
-                <img ng-src="http://7xqnsl.com1.z0.glb.clouddn.com/{{$info->img}}.png" style="width: 245px; height: 342px">
+            <div class="card-image text-center">
+                <img src="http://p7vlj38y9.bkt.clouddn.com/{{$info->img}}.pn1g" alt="{{$info->title}}">
+                <br><br>
+                <label>插图：<a href="#">{{ $info->illustratorName }}</a></label>
             </div>
-            <label>插图：<a href="#">{{ $info->illustratorName }}</a></label>
             <div id="tab-sharing" class="hide">
                 <div class="btn-group social-list social-likes social-likes_visible" data-counters="no">
                     <span class="btn btn-default social-likes__widget social-likes__widget_facebook" title="Share link on Facebook">
@@ -20,46 +89,54 @@
             </div>
         </div>
         <div class="col-md-8">
-            <h2 class="mt-0">
-                <span class="pokemon-icon pokemon-icon-{{ $info->pmId }}" title="{{ $info->pmId }}"></span>
-                {{$info->title}}
-                @if($info->lv)
-                <span class="pull-right">
-                    <small>Lv.</small>
-                    &nbsp;{{$info->lv}}&nbsp;
-                </span>
-                @endif
-            </h2>
-            <h2 class="mt-0">
-                <label>{{$info->tc}}</label>
-                @if($info->evolve)
-                <div>
-                  进化自：<a href="#">{{$info->evolve}}</a>
+            <div class="panel top">
+                <div class="panel-heading">
+                    <span class="pokemon-icon pokemon-icon-{{ $info->pmId }}" title="{{ $info->pmId }}"></span>
+                    {{$info->title}}
+                    @if($info->lv)
+                    <span class="pull-right">
+                        <small>Lv.</small>
+                        &nbsp;{{$info->lv}}&nbsp;
+                    </span>
+                    @endif
                 </div>
-                @endif
-                <span class="pull-right">
-                    @if($info->hp)
-                    <small>HP</small>&nbsp;{{ $info->hp }}&nbsp;
-                    @endif
-                    @if($info->energyName)
-                    {!! energy($info->energyName) !!}
-                    @endif
-                </span>
-            </h2>
+                <div class="panel-content">
+                    <div class="left">
+                        <label>{{$info->tc}}</label>
+                        @if($info->evolve)
+                        <div>
+                          进化自：<a href="#">{{$info->evolve}}</a>
+                        </div>
+                        @endif
+                    </div>
+                    
+                    <span class="right">
+                        @if($info->hp)
+                        <small>HP</small>&nbsp;{{ $info->hp }}&nbsp;
+                        @endif
+                        @if($info->energyName)
+                        {!! energy($info->energyName) !!}
+                        @endif
+                    </span>
+                </div>
+            </div>
             <div class="clearfix"></div>
             @if($rule)
                 @foreach ($rule as $item)
-                <div class="alert alert-warning" role="alert">{{$item->title}}：{{$item->content}}</div>
+                <div class="input-group">
+                  <span class="input-group-addon">{{$item->title}}</span>
+                  <p class="form-control">{{$item->content}}</p>
+                </div>
                 @endforeach
             @endif
             @if($abilitys)
             <div class="abilitys">
                 @if($abilitys->abilityName)
-                <div class="panel panel-default">
-                  <div class="panel-heading">
-                    <span class="label label-primary">特性</span>
+                <div class="panel">
+                  <h3 class="panel-heading">
+                    <span class="label">特性</span>
                     {{ $abilitys->abilityName }}
-                  </div>
+                  </h3>
                   <div class="panel-body">
                     {{ $abilitys->abilityContent }}
                   </div>
@@ -70,12 +147,12 @@
             @if($power)
               <div class="power">
                 @foreach ($power as $item)
-                <div class="panel panel-info">
-                    <div class="panel-heading">
+                <div class="panel">
+                    <h3 class="panel-heading">
                         <span>{!! energy($item->cost) !!}</span>
                         {{ $item->title }}
                         <span class="pull-right">{{$item->damage}}</span>
-                    </div>
+                    </h3>
                     <div class="panel-body">
                         {{ $item->content }}
                     </div>
@@ -83,22 +160,24 @@
                 @endforeach
             </div>
             @endif
+            <div class="jumbotron">
             @if($info->hp)
-            <div class="row text-center">
-                <div class="col-xs-4">
-                    <label>弱点</label>
-                    <div class="rwbox">{!! energy($info->weakness) !!}</div>
+                <div class="row text-center">
+                    <div class="col-xs-4">
+                        <label>弱点</label>
+                        <div class="rwbox">{!! statLoad($info->weakness) !!}</div>
+                    </div>
+                    <div class="col-xs-4">
+                        <label>抗性</label>
+                        <div class="rwbox">{!! statLoad($info->resistance) !!}</div>
+                    </div>
+                    <div class="col-xs-4">
+                        <label>撤退</label>
+                        <div class="energy-list">{!! statLoad($info->resistance) !!}</div>
+                    </div>
                 </div>
-                <div class="col-xs-4">
-                    <label>抗性</label>
-                    <div class="rwbox">{!! energy($info->resistance) !!}</div>
-                </div>
-                <div class="col-xs-4">
-                    <label>撤退</label>
-                    <div class="energy-list">{!! energy($info->resistance) !!}</div>
-                </div>
-            </div>
             @endif
+            </div>
             <div class="stats-footer">
                 <h3>
                     <i class="icon-symbol symbol-XY11"></i>
