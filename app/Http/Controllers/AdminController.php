@@ -19,7 +19,10 @@ class AdminController extends Controller
         return view('admin.index');
     }
 
-    public function card(){
+    public function card($cate = null){
+        $series = DB::select('select series from pm_subcategory GROUP BY series ORDER BY releaseDate desc');
+        $symbol = DB::table('pm_subcategory')->orderBy('releaseDate', 'desc')->get();
+
         $list = DB::table('pm_card')
                 ->leftJoin('pm_subcategory', 'pm_card.subcategory', '=', 'pm_subcategory.id')
                 ->leftJoin('pm_card_title', 'pm_card.titleId', '=', 'pm_card_title.id')
@@ -28,9 +31,11 @@ class AdminController extends Controller
                 ->leftJoin('pm_energy', 'pm_description.energy', '=', 'pm_energy.id')
                 ->select('pm_card.cardId', 'pm_card.pkmId', 'pm_card_title.title', 'pm_card.img', 'pm_subcategory.name as cate', 'pm_card_type_class.name as tc', 'pm_energy.name as energyName', 'pm_description.hp')
                 ->orderBy('pm_subcategory.releaseDate', 'desc')
-                ->orderBy('pm_card.cardId', 'asc')
-                ->paginate(25);
-        return view('admin.card', [ 'list' => $list ]);
+                ->orderBy('pm_card.subId', 'asc')->when($cate, function ($query) use ($cate) {
+                    return $query->where('symbol', $cate);
+                })
+                ->paginate(24);
+        return view('admin.card', [ 'list' => $list, 'series' => $series, 'symbol' => $symbol ]);
     }
     public function cardEdit($card){
         $card = (int) $card;
@@ -42,7 +47,7 @@ class AdminController extends Controller
                 ->leftJoin('pm_card_type_class', 'pm_card.typeClass', '=', 'pm_card_type_class.id')
                 ->leftJoin('pm_energy', 'pm_description.energy', '=', 'pm_energy.id')
                 ->leftJoin('pm_illustrator', 'pm_card.illustrator', '=', 'pm_illustrator.id')
-                ->select('pm_card.cardId', 'pm_card.pkmId', 'pm_card.pmId', 'pm_card_title.title', 'pm_card.img', 'pm_card.type', 'pm_card_type.name as typeName', 'pm_subcategory.name as cate', 'pm_card.rarity', 'pm_card_type_class.name as tc', 'pm_energy.name as energyName', 'pm_description.hp', 'pm_description.lv', 'pm_description.evolve', 'pm_description.weakness', 'pm_description.resistance', 'pm_description.retreat', 'pm_subcategory.name as illustratorName', 'pm_card.link')
+                ->select('pm_card.cardId', 'pm_card.pkmId', 'pm_card.pmId','pm_card.titleId', 'pm_card_title.title', 'pm_card.img', 'pm_card.type', 'pm_card_type.name as typeName', 'pm_subcategory.name as cate', 'pm_card.rarity', 'pm_card_type_class.name as tc', 'pm_energy.name as energyName', 'pm_description.hp', 'pm_description.lv', 'pm_description.evolve', 'pm_description.weakness', 'pm_description.resistance', 'pm_description.retreat', 'pm_subcategory.name as illustratorName', 'pm_card.link')
                 ->where('pm_card.cardId', $card)->first();
         //print_r($imageUrl);
         $abilitys = DB::table('pm_ability as a')
@@ -51,15 +56,14 @@ class AdminController extends Controller
                     ->leftJoin('pm_power_title as t2', 'a.bodytitle', '=', 't2.id')
                     ->leftJoin('pm_power_content as c2', 'a.bodycontent', '=', 'c2.id')
                     ->leftJoin('pm_rule as r', 'a.exId', '=', 'r.id')
-                    ->select('t.id as abilityId', 't.title as abilityName', 'c.id as abilityContentId', 'c.content as abilityContent', 't.title_en as abilityNameEn', 'c.content_en as abilityContentEn', 'a.restored', 'a.exId', 'a.exObject', 'r.title as ruleName', 'r.content as ruleContent', 't2.title as bodyName','c2.content as bodyContent', 'a.LV', 'a.BODY2')
+                    ->select('t.id as abilityId', 't.title as abilityName', 'c.id as abilityContentId', 'c.content as abilityContent', 'c.status as contentStatus', 't.title_en as abilityNameEn', 'c.content_en as abilityContentEn', 'a.restored', 'a.exId', 'a.exObject', 'r.title as ruleName', 'r.content as ruleContent','t2.id as bodyId', 't2.title as bodyName', 't2.title_en as bodyNameEn', 'c2.id as bodyContentId', 'c2.content as bodyContent', 'c2.content_en as bodyContentEn', 'c2.status as contentStatus2', 'a.LV', 'a.BODY2')
                     ->where('a.cardId', $card)->first();
-
         $power = DB::table('pm_ability_power as p')
                     ->leftJoin('pm_power_title as t', 'p.title', '=', 't.id')
                     ->leftJoin('pm_power_content as c', 'p.content', '=', 'c.id')
-                    ->select('p.id', 'p.cardId', 'p.cost', 'p.damage','t.id as tId', 't.title','c.id as cId', 'c.content', 't.title_en', 'c.content_en')
+                    ->select('p.id', 'p.cardId', 'p.cost', 'p.damage','t.id as tId', 't.title','c.id as cId', 'c.content', 't.title_en', 'c.content_en', 'c.status as contentStatus')
                     ->where('p.cardId', $card)->orderBy('p.id')->get();
-        return view('admin.cardEdit',[ 'info' => $info, 'abilitys' => $abilitys, 'power' => $power  ]);
+        return view('admin.cardEdit',[ 'info' => $info, 'abilitys' => $abilitys, 'power' => $power ]);
         //return view('admin.cardEdit');
     }
 
@@ -183,20 +187,85 @@ class AdminController extends Controller
 
     public function translateSave(Request $request){
         $pid = Input::get('pid');
+        $type = Input::get('type');
         $newTemp = Input::get('text');
-
-        $pos1 = strpos($newTemp,".");
-        $pos2 = strpos($newTemp,",");
-        if($newTemp != ""){
-            if(!$pos1 && !$pos2){
-                DB::table('pm_power_content')->where('id', $pid)->update(['content' => $newTemp, 'status' => 1]);
-            }else{
-                DB::table('pm_power_content')->where('id', $pid)->update(['content' => $newTemp]);
+        if($type == "title"){
+            DB::table('pm_power_title')->where('id', $pid)->update(['title' => $newTemp]);
+        }else if($type == "name"){
+            DB::table('pm_card_title')->where('id', $pid)->update(['title' => $newTemp]);
+        }else if($type == "content"){
+            $pos1 = strpos($newTemp,".");
+            $pos2 = strpos($newTemp,",");
+            if($newTemp != ""){
+                if(!$pos1 && !$pos2){
+                    DB::table('pm_power_content')->where('id', $pid)->update(['content' => $newTemp, 'status' => 1]);
+                }else{
+                    DB::table('pm_power_content')->where('id', $pid)->update(['content' => $newTemp]);
+                }
             }
         }
         $json = array('text' => $newTemp);
         return response()->json($json);
     }
+
+    public function addAbility(Request $request){
+        $cid = Input::get('cid');
+        $cid = (int) $cid;
+        $name = Input::get('name')?Input::get('name'):null;
+        $content = Input::get('content');
+        $attr = Input::get('ab');
+        $cost = Input::get('cost')?Input::get('cost'):null;
+        $damage = Input::get('damage')?Input::get('damage'):null;
+        $json = array('cid' => $cid);
+
+        if($name){
+            $abTitle = DB::table('pm_power_title')->select('id')->where('title_en',$name)->first();
+            if(!$abTitle){
+                $abTitle = DB::table('pm_power_title')->insertGetId(['title_en' => $name, 'title' => $name]);
+            }else{
+                $abTitle = $abTitle->id;
+            }
+            $json['name'] = $abTitle;
+        }
+
+        if($content){
+            $abContent = DB::table('pm_power_content')->select('id')->where('content_en',$content)->first();
+            if(!$abContent){
+                $abContent = DB::table('pm_power_content')->insertGetId(['content_en' => $content, 'content' => $content]);
+            }else{
+                $abContent = $abContent->id;
+            }
+            $json['content'] = $content;
+        }
+
+        if($attr == "ab"){
+            $ab = DB::table('pm_ability')->where('cardId', $cid)->where('abilitytitle', $abTitle)->where('abilitycontent', $abContent)->first();
+            $json['ab'] = $ab;
+            if(!$ab){
+                $id = DB::table('pm_ability')->insertGetId(['cardId' => $cid, 'abilitytitle' => $abTitle, 'abilitycontent' => $abContent]);
+                $json['result'] = $id;
+            }
+        }
+        elseif($attr == "pb"){
+            $ab = DB::table('pm_ability')->where('cardId', $cid)->where('bodytitle', $abTitle)->where('bodycontent', $abContent)->first();
+            $json['ab'] = $ab;
+            if(!$ab){
+                $id = DB::table('pm_ability')->insertGetId(['cardId' => $cid, 'bodytitle' => $abTitle, 'bodycontent' => $abContent]);
+                $json['result'] = $id;
+            }
+        }
+        else{
+            $po = DB::table('pm_ability_power')->where('cardId', $cid)->where('title', $abTitle)->where('content', $abContent)->first();
+            $json['po'] = $po;
+            if(!$po){
+                $id = DB::table('pm_ability_power')->insertGetId(['cardId' => $cid, 'cost' => $cost, 'damage' => $damage, 'title' => $abTitle, 'content' => $abContent]);
+                $json['result'] = $id;
+            }
+        }
+
+        return response()->json($json);
+    }
+
     public function loadImg(Request $request){
         $cid = Input::get('cid');
         $card = DB::table('pm_card')->where('cardId', $cid)->first();

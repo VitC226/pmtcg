@@ -8,16 +8,28 @@
 @section('content')
 <div class="container">
     <div class="row">
+    <?php $i = ""; $now = "1"; $count=0; ?>
     @foreach ($list as $item)
-        <a href="./database/{{ $item->symbol }}" class="col-xs-6 col-md-3">
+        <?php 
+        $now = $item->series;
+        
+        if($now != $i){
+            $i = $now;
+            $count=0;
+            echo '<div class="col-xs-12"><ol class="breadcrumb"><li>'.$i.'系列</li><a href="/search" class="pull-right">卡片搜索</a></ol></div>';
+        }
+        ?>
+        <a href="./database/{{ $item->symbol }}" class="col-xs-6 col-md-3" style="margin-bottom:20px;">
             <div class="thumbnail">
-                <img src="expansion-{{ $item->symbol }}.png" alt="{{ $item->name }}">
+                <img src="http://p86juraw2.bkt.clouddn.com/expansion-{{ $item->symbol }}.png" alt="{{ $item->name }}">
                 <div class="caption">
                     <h5>{{ $item->name }}</h5>
                     <p><small>{{ $item->releaseDate }}</small></p>
                 </div>
             </div>
         </a>
+        <?php $count++; if($count%2==0) echo '<div class="clearfix visible-xs-block"></div>'; if($count%4==0) echo '<div class="clearfix visible-md-block"></div>'; ?>
+        
     @endforeach
     </div>
 </div>

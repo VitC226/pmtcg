@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+Use Laravel\Socialite\Facades\Socialite;
 
 class LoginController extends Controller
 {
@@ -35,5 +36,42 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+    }
+
+    public function weibo() {
+        return Socialite::with('weibo')->redirect();
+        // return \Socialite::with('weibo')->scopes(array('email'))->redirect();
+    }
+
+    public function qq() {
+        return Socialite::with('qq')->redirect();
+    }
+
+    public function callback() {
+        try{
+            $oauthUser = Socialite::with('weibo')->user();
+
+            var_dump($oauthUser->getId());
+            var_dump($oauthUser->getNickname());
+            var_dump($oauthUser->getName());
+            var_dump($oauthUser->getEmail());
+            var_dump($oauthUser->getAvatar());
+        }catch (\Exception $e){
+            var_dump($e);
+        }
+    }
+
+    public function QQ_callback() {
+            $oauthUser = Socialite::with('qq')->stateless()->user();
+
+            var_dump($oauthUser->getId());
+            var_dump($oauthUser->getNickname());
+            var_dump($oauthUser->getName());
+            var_dump($oauthUser->getEmail());
+            var_dump($oauthUser->getAvatar());
+        try{
+        }catch (\Exception $e){
+            var_dump($e);
+        }
     }
 }

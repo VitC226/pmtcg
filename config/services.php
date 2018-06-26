@@ -35,4 +35,18 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
+     //qq
+    'qq' => [
+       'client_id' =>env('QQ_KEY'),
+       'client_secret'=> env('QQ_SECRET'),
+       'redirect'=>env('QQ_REDIRECT_URL'),
+    ],
+    
+    //weibo
+    'weibo' =>[
+    'client_id' =>env('WEIBO_KEY'),
+    'client_secret' =>env('WEIBO_CECRET'),
+    'redirect' =>env('WEIBO_REDIRECT_URL'),
+    ],
+
 ];

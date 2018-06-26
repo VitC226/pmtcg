@@ -145,12 +145,11 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">后台管理</a>
+          <a class="navbar-brand" href="/admin/index">后台管理</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="#">Dashboard</a></li>
-            <li><a href="#">Settings</a></li>
+            <li><a href="/admin/card">卡片管理</a></li>
             <li><a href="#">Profile</a></li>
             <li><a href="#">Help</a></li>
             <!-- Authentication Links -->
@@ -186,8 +185,8 @@
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
-            <li class="active"><a href="index">首页 <span class="sr-only">(current)</span></a></li>
-            <li><a href="card">卡片管理</a></li>
+            <li class="active"><a href="/admin/index">首页 <span class="sr-only">(current)</span></a></li>
+            <li><a href="/admin/card">卡片管理</a></li>
             <li><a href="#">Analytics</a></li>
             <li><a href="#">Export</a></li>
           </ul>

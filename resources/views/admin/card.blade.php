@@ -8,27 +8,39 @@
       <button type="button" class="btn btn-default">Right</button>
     </div>
 </h1>
+<!-- Nav tabs -->
+<div>
+  <ul class="nav nav-tabs" role="tablist">
+    @foreach ($series as $item)
+    <li role="presentation"><a href="#{{$item->series}}" aria-controls="{{$item->series}}" role="tab" data-toggle="tab">{{$item->series}}</a></li>
+    @endforeach
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    @foreach ($series as $item)
+    <div role="tabpanel" class="tab-pane" id="{{$item->series}}">
+        @foreach ($symbol as $sy)
+            @if($sy->series == $item->series)
+            <a class="btn btn-link" href="/admin/card/{{ $sy->symbol }}" role="button">{{$sy->name}}</a>
+            @endif
+        @endforeach
+    </div>
+    @endforeach
+  </div>
+</div>
 <table class="table table-bordered table-hover">
-            <tr><th>编号</th><th>卡片名</th><th>卡包</th><th>类型</th><th>属性</th><th>HP</th><th>操作</th></tr>
+            <tr><th>编号</th><th>卡片名</th><th>卡包</th><th>操作</th></tr>
         @foreach ($list as $item)
             <tr>
                 <td>
                     {{ $item->pkmId }}
                 </td>
                 <td>
-                    <a href="/admin/card/{{ $item->cardId }}">{{ $item->title }}</a>
+                <a href="/admin/card/{{ $item->cardId }}">{{ $item->title }}</a>
                 </td>
                 <td>
                     {{ $item->cate }}
-                </td>
-                <td>
-                    {{ $item->tc }}
-                </td>
-                <td>
-                    {{ $item->energyName }}
-                </td>
-                <td>
-                    {{ $item->hp }}
                 </td>
                 <td>
                     <a href="/admin/cardEdit/{{ $item->cardId }}">编辑</a>

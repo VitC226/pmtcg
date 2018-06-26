@@ -16,6 +16,12 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\Event' => [
             'App\Listeners\EventListener',
         ],
+        //QQ:
+        'SocialiteProviders\Manager\SocialiteWasCalled' => [
+            //'SocialiteProviders\Qq\QqExtendSocialite@handle',
+            'SocialiteProviders\QQ\QqExtendSocialite',
+            'SocialiteProviders\Weibo\WeiboExtendSocialite@handle',
+        ],
     ];
 
     /**

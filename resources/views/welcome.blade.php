@@ -8,8 +8,6 @@
         <title>Laravel</title>
 
         <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
-
         <!-- Styles -->
         <style>
             html, body {
@@ -79,7 +77,7 @@
 
             <div class="content">
                 <div class="title m-b-md">
-                    Laravel
+                    <div class="title">{{ trans('welcome.message') }}</div>
                 </div>
 
                 <div class="links">
@@ -89,7 +87,35 @@
                     <a href="https://forge.laravel.com">Forge</a>
                     <a href="https://github.com/laravel/laravel">GitHub</a>
                 </div>
-            </div>
+
+                    <!--<div class="title"><a href="/demo/zh_cn">{{ trans('welcome.message') }}</a></div>-->  
+                    <select onchange="changelanguage(this.value)">  
+                        <option value='zh-cmn-Hans'@if(App::getLocale() == 'zh-cmn-Hant') selected @endif>简体中文</option>>  
+                        <option value='zh-cmn-Hant'@if(App::getLocale() == 'zh-cmn-Hant') selected @endif>繁體中文</option>>
+                         <div>{{trans('welcome.message')}}{{$lan}}</div>  
+                    </select>  
+                
+                  
+            </div>  
+            <script src="http://lib.baomitu.com/jquery/2.2.4/jquery.min.js"></script>  
+              <script>  
+                  function changelanguage(val){  
+                      $.ajax({  
+                          type :'get',  
+                          url :'demos',  
+                          data:{  
+                            language :val    
+                          },  
+                          dataType :'json',  
+                          success:function(res){
+                            console.log("res");
+                             if(res){  
+                                 window.location.reload();  
+                             }  
+                          }  
+                      });
+                  }  
+              </script>  
         </div>
     </body>
 </html>
