@@ -48,3 +48,7 @@ Route::get('auth/weibo', 'Auth\LoginController@weibo');
 Route::get('auth/weibo/callback', 'Auth\LoginController@weibo_callback');
 Route::get('auth/qq', 'Auth\LoginController@qq');
 Route::get('auth/qq/callback', 'Auth\LoginController@qq_callback');
+
+/* Shop */
+Route::get('shop', 'ShopController@index');
+Route::get('shop/{item}', 'ShopController@item');
