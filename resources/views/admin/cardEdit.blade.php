@@ -1,115 +1,4 @@
-@extends('layouts.admin')
-@section('script')
-<script>
-  $(function(){
-      //url: "http://p7vlj38y9.bkt.clouddn.com/BW10_1.png",
-      $(".card-image").on("mouseenter",function(){
-        $(this).css("opacity",1);
-      }).on("mouseleave",function(){
-        $(this).css("opacity",0);
-      });
-    $('img#mainImg').on('load', function() {
-      $.post('loadImg',{
-          cid:$("#cardId").val()
-      },function(data){
-        console.log(data);
-      });
-    });
 
-    $(".box").on("click","button",function(){
-      var inputs = $(this).parent().next().find("input");
-      var li = $(this).parent().next().find("li").eq(0);
-      var key = li.data("value");
-      if (key.indexOf(" ") == 0){ key="^"+key; }
-      $.post('translate',{
-          tid:$(this).parent().data("id"),
-          rule:inputs.eq(0).val(),
-          php:inputs.eq(1).val(),
-          text:inputs.eq(2).val(),
-          key:key
-      }, function(data){
-          console.log(data);
-          
-          if(data.address && data.address.length > 0){
-              var html = "";
-              for(var item of data.address){
-                  html+=item+"\n";
-              }
-              $("#input2").val(html);
-          }
-      });
-    });
-
-    $(".btn-power").on("click",function(){
-      let type = $(this).data("type");
-      let id = $(this).data("id");
-      $.post('translateSave',{
-          type:type,
-          pid:id,
-          text:$("#input_"+type+"_"+id).val()
-      }, function(data){
-          console.log(data);
-      });
-    });
-
-    $(".btn-ab").on("click",function(){
-      $(".abilitys").append('<div class="panel panel-default"><div class="panel-body"><label><span class="label label-primary">特性</span><input type="checkbox" class="pokeBody">PokeBody</label><input type="text" class="form-control name_en" placeholder="English Name"><textarea rows="5" class="form-control content_en" placeholder="English Content"></textarea></textarea><button type="button" data-type="content" class="btn btn-info pull-right btn-xs btn-new-ab">保存</button></div></div>');
-    });
-
-    $(".btn-po").on("click",function(){
-      $(".power").append('<div class="panel panel-default"><div class="panel-body"><input type="text" class="form-control name_en" placeholder="English Name"><input type="text" class="form-control cost" placeholder="Cost"><input type="text" class="form-control damage" placeholder="damage"><textarea rows="5" class="form-control content_en" placeholder="English Content"></textarea><button type="button" class="btn btn-info pull-right btn-xs btn-new-po">保存</button></div></div>');
-    });
-
-    $(".abilitys").on("click",".btn-new-ab",function(){
-      var div = $(this).parent();
-      var name = div.find(".name_en").val();
-      var content = div.find(".content_en").val();
-      var pokeBody = div.find(".pokeBody").is(':checked');
-      var ab = (div.find(".pokeBody").is(':checked'))?"pb":"ab";
-
-      
-      $.post('addAbility',{
-          cid:$("#cardId").val(),
-          ab:ab,
-          name:name,
-          content:content
-      }, function(data){
-          console.log(data);
-          if(data.result){
-            //window.location.reload();
-          }
-      });
-    });
-
-    $(".power").on("click",".btn-new-po",function(){
-      var div = $(this).parent();
-      var name = div.find(".name_en").val();
-      var content = div.find(".content_en").val();
-      var cost = div.find(".cost").val();
-      var damage = div.find(".damage").val();
-
-      $.post('addAbility',{
-          cid:$("#cardId").val(),
-          cost:cost,
-          damage:damage,
-          name:name,
-          content:content
-      }, function(data){
-          console.log(data);
-          if(data.result){
-            window.location.reload();
-          }
-      });
-    });
-
-    $("#name_tran").on("click",function(){
-      $(this).next().val($(this).text());
-    });
-  });
-</script>
-@endsection
-
-@section('content')
 <div class="container">
   <div class="row">
     @if($info)
@@ -255,4 +144,117 @@
         {!! test() !!}
   </div>
 </div>
-@endsection
+<script>
+  $.ajaxSetup({
+    headers: {
+      'X-CSRF-TOKEN': '{{ csrf_token() }}'
+    }
+  });
+</script>
+<script>
+  $(function(){
+      //url: "http://p7vlj38y9.bkt.clouddn.com/BW10_1.png",
+      $(".card-image").on("mouseenter",function(){
+        $(this).css("opacity",1);
+      }).on("mouseleave",function(){
+        $(this).css("opacity",0);
+      });
+    // $('img#mainImg').on('load', function() {
+    //   $.post('loadImg',{
+    //       cid:$("#cardId").val()
+    //   },function(data){
+    //     console.log(data);
+    //   });
+    // });
+
+    $(".box").on("click","button",function(){
+      var inputs = $(this).parent().next().find("input");
+      var li = $(this).parent().next().find("li").eq(0);
+      var key = li.data("value");
+      if (key.indexOf(" ") == 0){ key="^"+key; }
+      $.post('/mm/cardEdit/translate',{
+          tid:$(this).parent().data("id"),
+          rule:inputs.eq(0).val(),
+          php:inputs.eq(1).val(),
+          text:inputs.eq(2).val(),
+          key:key
+      }, function(data){
+          console.log(data);
+          
+          if(data.address && data.address.length > 0){
+              var html = "";
+              for(var item of data.address){
+                  html+=item+"\n";
+              }
+              $("#input2").val(html);
+          }
+      });
+    });
+
+    $(".btn-power").on("click",function(){
+      let type = $(this).data("type");
+      let id = $(this).data("id");
+      $.post('/mm/cardEdit/translateSave',{
+          type:type,
+          pid:id,
+          text:$("#input_"+type+"_"+id).val()
+      }, function(data){
+          console.log(data);
+      });
+    });
+
+    $(".btn-ab").on("click",function(){
+      $(".abilitys").append('<div class="panel panel-default"><div class="panel-body"><label><span class="label label-primary">特性</span><input type="checkbox" class="pokeBody">PokeBody</label><input type="text" class="form-control name_en" placeholder="English Name"><textarea rows="5" class="form-control content_en" placeholder="English Content"></textarea></textarea><button type="button" data-type="content" class="btn btn-info pull-right btn-xs btn-new-ab">保存</button></div></div>');
+    });
+
+    $(".btn-po").on("click",function(){
+      $(".power").append('<div class="panel panel-default"><div class="panel-body"><input type="text" class="form-control name_en" placeholder="English Name"><input type="text" class="form-control cost" placeholder="Cost"><input type="text" class="form-control damage" placeholder="damage"><textarea rows="5" class="form-control content_en" placeholder="English Content"></textarea><button type="button" class="btn btn-info pull-right btn-xs btn-new-po">保存</button></div></div>');
+    });
+
+    $(".abilitys").on("click",".btn-new-ab",function(){
+      var div = $(this).parent();
+      var name = div.find(".name_en").val();
+      var content = div.find(".content_en").val();
+      var pokeBody = div.find(".pokeBody").is(':checked');
+      var ab = (div.find(".pokeBody").is(':checked'))?"pb":"ab";
+
+      
+      $.post('/mm/cardEdit/addAbility',{
+          cid:$("#cardId").val(),
+          ab:ab,
+          name:name,
+          content:content
+      }, function(data){
+          console.log(data);
+          if(data.result){
+            //window.location.reload();
+          }
+      });
+    });
+
+    $(".power").on("click",".btn-new-po",function(){
+      var div = $(this).parent();
+      var name = div.find(".name_en").val();
+      var content = div.find(".content_en").val();
+      var cost = div.find(".cost").val();
+      var damage = div.find(".damage").val();
+
+      $.post('/mm/cardEdit/addAbility',{
+          cid:$("#cardId").val(),
+          cost:cost,
+          damage:damage,
+          name:name,
+          content:content
+      }, function(data){
+          console.log(data);
+          if(data.result){
+            window.location.reload();
+          }
+      });
+    });
+
+    $("#name_tran").on("click",function(){
+      $(this).next().val($(this).text());
+    });
+  });
+</script>

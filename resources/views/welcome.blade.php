@@ -87,14 +87,6 @@
                     <a href="https://forge.laravel.com">Forge</a>
                     <a href="https://github.com/laravel/laravel">GitHub</a>
                 </div>
-
-                    <!--<div class="title"><a href="/demo/zh_cn">{{ trans('welcome.message') }}</a></div>-->  
-                    <select onchange="changelanguage(this.value)">  
-                        <option value='zh-cmn-Hans'@if(App::getLocale() == 'zh-cmn-Hant') selected @endif>简体中文</option>>  
-                        <option value='zh-cmn-Hant'@if(App::getLocale() == 'zh-cmn-Hant') selected @endif>繁體中文</option>>
-                         <div>{{trans('welcome.message')}}{{$lan}}</div>  
-                    </select>  
-                
                   
             </div>  
             <script src="http://lib.baomitu.com/jquery/2.2.4/jquery.min.js"></script>  

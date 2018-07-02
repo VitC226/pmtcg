@@ -45,13 +45,13 @@
                         </li>
                         <li>
                             <a href="/download">{{trans('website.menu_download')}}</a>
-                        </li>
+                        </li><!-- 
                         <li>
                             <a href="/shop">商店</a>
                         </li>
                         <li>
                             <a href="/login">登录</a>
-                        </li>
+                        </li> -->
                     </ul>
                 </nav>
             </div>

@@ -31,18 +31,18 @@ Route::get('/card/{card}', 'CardController@card');
 Route::get('/card/{card}', 'CardController@card');
 
 /* Admin */
-Route::get('admin/index', 'AdminController@index');
-Route::get('admin/card', 'AdminController@card');
-Route::get('admin/card/{cate?}', 'AdminController@card');
-Route::get('admin/cardEdit/{card}', 'AdminController@cardEdit');
-Route::post('admin/cardEdit/translate', 'AdminController@translate');
-Route::post('admin/cardEdit/addAbility', 'AdminController@addAbility');
-Route::post('admin/cardEdit/addPower', 'AdminController@addPower');
-Route::post('admin/cardEdit/translateSave', 'AdminController@translateSave');
-Route::post('admin/cardEdit/loadImg', 'AdminController@loadImg');
-Route::get('admin/collect', 'AdminController@collect');
-Route::post('admin/collectIndex', 'AdminController@collectIndex');
-Route::post('admin/collectCard', 'AdminController@collectCard');
+Route::get('mm/index', 'AdminController@index');
+Route::get('mm/card', 'AdminController@card');
+Route::get('mm/card/{cate?}', 'AdminController@card');
+Route::get('mm/cardEdit/{card}', 'AdminController@cardEdit');
+Route::post('mm/cardEdit/translate', 'AdminController@translate');
+Route::post('mm/cardEdit/addAbility', 'AdminController@addAbility');
+Route::post('mm/cardEdit/addPower', 'AdminController@addPower');
+Route::post('mm/cardEdit/translateSave', 'AdminController@translateSave');
+Route::post('mm/cardEdit/loadImg', 'AdminController@loadImg');
+Route::get('mm/collect', 'AdminController@collect');
+Route::post('mm/collectIndex', 'AdminController@collectIndex');
+Route::post('mm/collectCard', 'AdminController@collectCard');
 
 Route::get('auth/weibo', 'Auth\LoginController@weibo');
 Route::get('auth/weibo/callback', 'Auth\LoginController@weibo_callback');

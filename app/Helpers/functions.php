@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\DB;
-use App\Libs\ImageDuel;
 
 function energy($value){
     if($value == "") return;
@@ -234,13 +233,16 @@ function  hello(){
     $rule = "If % is your Active Pokémon and is damaged by an opponent's attack (even if % is Knocked Out), "; 
     $php = "If (.*?) is your Active Pokémon and is damaged by an opponent's attack (even if (.*?) is Knocked Out), ";
     $text = "当该宝可梦为己方出战宝可梦并且受到对方宝可梦的技能伤害时，";
-//从弃牌区选择最多一张能量卡放置到该宝可梦身上。
+//从弃牌区选择最多4张{Lightning}能量卡放置到该宝可梦身上。
 //该宝可梦陷入混乱状态。
 //从卡组搜索最多3张宝可梦道具卡，一只宝可梦，。
 //移除己方后场所有宝可梦身上的3个伤害指示物。
-//追加该宝可梦身上的{Water}能量卡数量×10点伤害。
-//该卡需要凑齐另一部分的「????」才能从手牌放置到后场上。当该宝可梦被击败时，对方抽2张奖品卡。
-
+//追加该宝可梦身上的{Water}能量卡数量×10点伤害。         
+//该卡需要凑齐另一部分的「尼多兰♀」才能从手牌放置到后场上。当该宝可梦被击败时，对方抽2张奖品卡。
+己方回合开始时， if Elekid is anywhere under Electivire, you may move a <span class="energy-symbol Lightning" title="Lightning">Lightning</span> Energy attached to 1 of your Pokémon to Electivire. 该宝可梦陷入异常状态时无法使用该特殊能力。
+The attack cost of your Nidoran ♀, Nidorina, Nidoran ♂, Nidorino, and Nidoking's attack is <span class="energy-symbol Colorless" title="Colorless">Colorless</span> less.
+If you have the same number of or less Benched Pokémon than your opponent, 
+As long as the Defending Pokémon's remaining HP is 60 or less, 当受到该技能攻击的对方宝可梦的剩余HP不超过60点时，
     if(strpos($rule,'%')===false){
                 $list = DB::select("SELECT * FROM pm_power_content WHERE content_en REGEXP\"".$rule."\" and status is null");
             }

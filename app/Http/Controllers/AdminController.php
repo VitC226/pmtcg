@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Libs\ImageDuel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
-use QL\QueryList;
 
 class AdminController extends Controller
 {
     public function __construct(){
-        $this->middleware('auth');
+        //$this->middleware('auth');
     }
 
     ///管理中心
@@ -266,14 +264,6 @@ class AdminController extends Controller
         return response()->json($json);
     }
 
-    public function loadImg(Request $request){
-        $cid = Input::get('cid');
-        $card = DB::table('pm_card')->where('cardId', $cid)->first();
-        $image = new ImageDuel();
-        $image->create($card->link,$card->img);
-        $json = array('text' => "请求已提交");
-        return response()->json($json);
-    }
 
     public function collect(){
         $url = "https://www.pokemon.com/us/pokemon-tcg/pokemon-cards/sm-series/sm1/1/";

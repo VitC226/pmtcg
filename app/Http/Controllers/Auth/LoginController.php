@@ -48,9 +48,9 @@ class LoginController extends Controller
     }
 
     public function callback() {
+
         try{
             $oauthUser = Socialite::with('weibo')->user();
-
             var_dump($oauthUser->getId());
             var_dump($oauthUser->getNickname());
             var_dump($oauthUser->getName());
@@ -61,17 +61,13 @@ class LoginController extends Controller
         }
     }
 
-    public function QQ_callback() {
-            $oauthUser = Socialite::with('qq')->stateless()->user();
-
-            var_dump($oauthUser->getId());
-            var_dump($oauthUser->getNickname());
-            var_dump($oauthUser->getName());
-            var_dump($oauthUser->getEmail());
-            var_dump($oauthUser->getAvatar());
-        try{
-        }catch (\Exception $e){
-            var_dump($e);
-        }
+    public function qq_callback() {
+        $oauthUser = Socialite::driver('qq')->user();
+        dump($oauthUser);
+        var_dump($oauthUser->getId());
+        var_dump($oauthUser->getNickname());
+        var_dump($oauthUser->getName());
+        var_dump($oauthUser->getEmail());
+        var_dump($oauthUser->getAvatar());
     }
 }
